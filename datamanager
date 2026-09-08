@@ -1,0 +1,102 @@
+const DataManager = (() => {
+  const state = {
+    activities: [],
+    initialized: false
+  };
+
+  const seedData = [
+    {id: 1, date: '2026-08-17', category: 'Web Systems', activity: 'Submitted Web Systems Laboratory', status: 'completed', score: 95},
+    {id: 2, date: '2026-08-16', category: 'JavaScript', activity: 'Completed JavaScript Quiz', status: 'completed', score: 92},
+    {id: 3, date: '2026-08-15', category: 'Web Systems', activity: 'New assignment posted', status: 'pending', score: null},
+    {id: 4, date: '2026-08-14', category: 'Database', activity: 'Database activity due soon', status: 'pending', score: null},
+    {id: 5, date: '2026-08-13', category: 'General', activity: 'Attendance recorded', status: 'completed', score: 100},
+    {id: 6, date: '2026-08-12', category: 'Web Systems', activity: 'Web Systems class completed', status: 'completed', score: 90},
+    {id: 7, date: '2026-08-11', category: 'JavaScript', activity: 'DOM manipulation exercise', status: 'completed', score: 88},
+    {id: 8, date: '2026-08-10', category: 'Database', activity: 'SQL normalization activity', status: 'overdue', score: null},
+    {id: 9, date: '2026-08-09', category: 'JavaScript', activity: 'Async JavaScript practice', status: 'pending', score: null},
+    {id: 10, date: '2026-08-08', category: 'Web Systems', activity: 'Dashboard planning activity', status: 'completed', score: 94}
+  ];
+
+  function initializeData() {
+    const saved = localStorage.getItem('studentPortalActivities');
+    state.activities = saved ? JSON.parse(saved) : structuredClone(seedData);
+    state.initialized = true;
+    if (!saved) persist();
+    return getActivities();
+  }
+
+  function persist() {
+    localStorage.setItem('studentPortalActivities', JSON.stringify(state.activities));
+  }
+
+  function getActivities() {
+    return [...state.activities];
+  }
+
+  function getCategories() {
+    return [...new Set(state.activities.map(item => item.category))].sort();
+  }
+
+  function searchProducts(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return getActivities();
+    return state.activities.filter(item =>
+      item.activity.toLowerCase().includes(q) ||
+      item.category.toLowerCase().includes(q) ||
+      item.status.toLowerCase().includes(q)
+    );
+  }
+
+  function applyFilters({query = '', category = 'all', status = 'all'} = {}) {
+    return searchProducts(query).filter(item =>
+      (category === 'all' || item.category === category) &&
+      (status === 'all' || item.status === status)
+    );
+  }
+
+  function getStatistics() {
+    const scores = state.activities.filter(x => typeof x.score === 'number').map(x => x.score);
+    const average = scores.length ? scores.reduce((a,b) => a+b, 0) / scores.length : 0;
+    const completed = state.activities.filter(x => x.status === 'completed').length;
+    return {
+      gpa: (1 + (average / 100) * 4).toFixed(2),
+      courses: 6,
+      assignments: state.activities.length,
+      attendance: Math.round((completed / state.activities.length) * 100)
+    };
+  }
+
+  function getLowPerformanceItems() {
+    return state.activities.filter(x => typeof x.score === 'number' && x.score < 90);
+  }
+
+  function simulateUpdate() {
+    const pending = state.activities.find(x => x.status === 'pending');
+    if (pending) {
+      pending.status = 'completed';
+      pending.score = Math.floor(85 + Math.random() * 16);
+    } else {
+      const nextId = Math.max(...state.activities.map(x => x.id)) + 1;
+      state.activities.unshift({
+        id: nextId,
+        date: new Date().toISOString().slice(0,10),
+        category: 'Web Systems',
+        activity: 'Real-time dashboard update received',
+        status: 'completed',
+        score: Math.floor(88 + Math.random() * 13)
+      });
+    }
+    persist();
+    return getActivities();
+  }
+
+  function exportToCSV(data) {
+    const headers = ['Date', 'Category', 'Activity', 'Status', 'Score'];
+    const rows = data.map(x => [x.date, x.category, x.activity, x.status, x.score ?? '']);
+    return [headers, ...rows]
+      .map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(','))
+      .join('\n');
+  }
+
+  return {initializeData, getActivities, getCategories, applyFilters, getStatistics, getLowPerformanceItems, simulateUpdate, exportToCSV};
+})();
