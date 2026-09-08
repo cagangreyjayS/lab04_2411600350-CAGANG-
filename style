@@ -1,0 +1,20 @@
+body { background: #6E0890; }
+.bg-primary-custom, .login-card-header { background: #5E3023; }
+.btn-primary-custom { background: #C08552; color: #fff; border: none; }
+.btn-primary-custom:hover { background: #0b5ed7; color: #fff; }
+.login-card { width: 100%; max-width: 430px; border: 0; }
+.sidebar { min-height: calc(100vh - 56px); }
+.sidebar .nav-link { color: #495057; border-radius: .5rem; transition: .2s ease; }
+.sidebar .nav-link:hover, .sidebar .nav-link.active { background: #e7f1ff; color: #0d6efd; }
+.stat-card, .chart-card { border: 0; box-shadow: 0 .125rem .5rem rgba(0,0,0,.06); transition: transform .2s ease, box-shadow .2s ease; }
+.stat-card:hover, .chart-card:hover { transform: translateY(-2px); box-shadow: 0 .4rem 1rem rgba(0,0,0,.09); }
+.chart-container { position: relative; height: 300px; }
+.chart-wide { height: 320px; }
+.low-performance-row { background: #fff3cd !important; }
+mark { padding: 0; }
+@media (max-width: 767.98px) {
+  .sidebar { min-height: auto; }
+  main { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .chart-container, .chart-wide { height: 250px; }
+  #greeting { font-size: 1.35rem; }
+}
